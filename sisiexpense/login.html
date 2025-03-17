@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>开支管理系统-登录</title>
+    <link rel="stylesheet" href="styles.css">
+
+</head>
+<body>
+    <!-- 登录界面 -->
+    <div id="loginSection" class="section">
+        <h2>用户登录</h2>
+        <input type="text" id="username" placeholder="输入用户名">
+        <button onclick="login()">登录</button>
+    </div>
+        
+    </div>
+    <script>
+
+        const API_BASE = 'http://localhost:5000/api';
+
+        async function login() {
+            try {
+                const response = await fetch(`${API_BASE}/login`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ username: document.getElementById('username').value.trim() })
+                    });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `HTTP错误: ${response.status}`);
+                }
+
+                const { user, token } = await response.json();
+                localStorage.setItem('token', token);
+                window.location.replace("main.html");
+            } catch (error) {
+                alert(`登录失败: ${error.message}`);
+                console.error('登录错误详情:', error);
+            }
+        }
+    </script>
+</body>
+</html>
