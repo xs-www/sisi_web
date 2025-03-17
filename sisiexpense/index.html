@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>宿舍开支管理系统</title>
+    <style>
+        /* 基础样式 */
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #2196F3;
+            --danger-color: #f44336;
+            --background: #f5f5f5;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui;
+        }
+
+        body {
+            margin: 0;
+            padding: 10px;
+            background: var(--background);
+            font-size: 14px;
+            color: #333;
+        }
+
+        /* 登录界面 */
+        #loginSection {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-width: 400px;
+            margin: 20vh auto 0;
+        }
+
+        #loginSection h2 {
+            margin: 0 0 20px;
+            color: var(--primary-color);
+        }
+
+        /* 输入控件 */
+        input, select, button {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        button:active {
+            opacity: 0.8;
+        }
+
+        /* 主界面 */
+        #mainContent {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .current-user {
+            text-align: right;
+            padding: 10px;
+            background: white;
+            margin-bottom: 10px;
+            border-radius: 8px;
+        }
+
+        /* 模块样式 */
+        .section {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        h1, h2 {
+            margin: 0 0 15px;
+            color: var(--primary-color);
+        }
+
+        h1 {
+            font-size: 1.5em;
+        }
+
+        h2 {
+            font-size: 1.3em;
+        }
+
+        /* 表格响应式处理 */
+        table {
+            width: 100%;
+            overflow-x: auto;
+            display: block;
+        }
+
+        th, td {
+            padding: 12px;
+            min-width: 80px;
+            white-space: nowrap;
+        }
+
+        /* 移动端优化 */
+        @media (max-width: 480px) {
+            /* 隐藏上传人列 */
+            td:nth-child(5), th:nth-child(5) {
+                display: none;
+            }
+
+            /* 调整操作按钮大小 */
+            .delete-btn {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+
+            /* 支付人选择器优化 */
+            #payer {
+                font-size: 14px;
+            }
+        }
+
+        /* 管理面板 */
+        #adminPanel button {
+            background: var(--danger-color);
+            margin: 5px 0;
+        }
+
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        /* 加载状态 */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- 登录界面 -->
+    <div id="loginSection" style="display: none;">
+        <h2>用户登录</h2>
+        <input type="text" id="username" placeholder="输入你的名字">
+        <label><input type="checkbox" id="rememberMe"> 记住我</label>
+        <button onclick="login()">进入系统</button>
+    </div>
+
+    <!-- 主界面 -->
+    <div id="mainContent" style="display: none;">
+        <div class="current-user" id="currentUser"></div>
+        <h1>宿舍开支管理系统</h1>
+
+        <!-- 新增开支表单 -->
+        <div class="section">
+            <h2>新增开支</h2>
+            <input type="text" id="item" placeholder="物品名称">
+            <input type="number" id="price" placeholder="价格">
+            <select id="payer">
+                <option value="">请选择支付人</option>
+                <option value="bowei">Bowei</option>
+                <option value="winston">Winston</option>
+                <option value="alan">Alan</option>
+                <option value="zach">Zach</option>
+            </select>
+            <button onclick="addExpense()">添加记录</button>
+        </div>
+
+        <!-- 当前累计金额 -->
+        <div class="section">
+            <h2>累计支出</h2>
+            <table id="balanceTable">
+                <thead>
+                    <tr><th>姓名</th><th>总支出</th></tr>
+                </thead>
+                <tbody id="balanceBody"></tbody>
+            </table>
+        </div>
+
+        <!-- 开支日志 -->
+        <div class="section">
+            <h2>开支记录</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>时间</th>
+                        <th>支付人</th>
+                        <th>物品</th>
+                        <th>价格</th>
+                        <th>上传人</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="logBody"></tbody>
+            </table>
+        </div>
+
+        <!-- 管理面板 -->
+        <div class="section" style="border-color: red;">
+            <h2>数据管理（需要密码）</h2>
+            <input type="password" id="adminPass" placeholder="输入管理密码">
+            <button onclick="showAdminPanel()">验证密码</button>
+            <div id="adminPanel" style="display: none;">
+                <button onclick="deleteAllData()">删除所有数据</button>
+                <button onclick="exportData()">导出数据</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 系统配置
+        const ADMIN_PASSWORD = '12345678'; // 修改管理密码
+        let currentUser = null;
+
+        // 初始化存储
+        function initStorage() {
+            if(!localStorage.getItem('expenses')) {
+                localStorage.setItem('expenses', JSON.stringify([]));
+                localStorage.setItem('balances', JSON.stringify({}));
+            }
+        }
+
+        // 登录功能
+        function login() {
+            currentUser = document.getElementById('username').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
+
+            if(rememberMe) localStorage.setItem('savedUser', currentUser);
+            
+            // 设置默认支付人
+            const payerSelect = document.getElementById('payer');
+            payerSelect.value = currentUser;
+            
+            showMainInterface();
+        }
+
+        // 修改后的showMainInterface函数
+        function showMainInterface() {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+            document.getElementById('currentUser').innerHTML = 
+                `当前用户：${currentUser} <button onclick="logout()">注销</button>`;
+            
+            // 新增支付人默认设置
+            const payerSelect = document.getElementById('payer');
+            if (payerSelect) {
+                payerSelect.value = currentUser;
+            }
+            
+            initStorage();
+            updateDisplay();
+        }
+
+        // 注销功能
+        function logout() {
+            localStorage.removeItem('savedUser');
+            location.reload();
+        }
+
+        // 添加开支记录
+        function addExpense() {
+            const item = document.getElementById('item').value;
+            const price = parseFloat(document.getElementById('price').value);
+            const payer = document.getElementById('payer').value || currentUser;
+
+            if(!item || !price || !payer) return alert('请填写完整信息！');
+
+            const newRecord = {
+                time: new Date().toLocaleString(),
+                payer: payer,
+                item: item,
+                price: price,
+                uploader: currentUser
+            };
+
+            const expenses = JSON.parse(localStorage.getItem('expenses'));
+            expenses.push(newRecord);
+            localStorage.setItem('expenses', JSON.stringify(expenses));
+
+            updateBalances(payer, price);
+            resetForm();
+            updateDisplay();
+        }
+
+        // 更新余额
+        function updateBalances(payer, amount) {
+            const balances = JSON.parse(localStorage.getItem('balances'));
+            balances[payer] = (balances[payer] || 0) + amount;
+            localStorage.setItem('balances', JSON.stringify(balances));
+        }
+
+        // 重置表单
+        function resetForm() {
+            document.getElementById('item').value = '';
+            document.getElementById('price').value = '';
+            document.getElementById('payer').value = currentUser;
+        }
+
+        // 更新显示
+        function updateDisplay() {
+            // 显示累计金额
+            const balances = JSON.parse(localStorage.getItem('balances'));
+            document.getElementById('balanceBody').innerHTML = 
+                Object.keys(balances).map(name => `
+                    <tr>
+                        <td>${name}</td>
+                        <td>${balances[name].toFixed(2)}</td>
+                    </tr>
+                `).join('');
+
+            // 显示开支记录
+            const expenses = JSON.parse(localStorage.getItem('expenses'));
+            document.getElementById('logBody').innerHTML = expenses.map((expense, index) => `
+                <tr>
+                    <td>${expense.time}</td>
+                    <td>${expense.payer}</td>
+                    <td>${expense.item}</td>
+                    <td>${expense.price.toFixed(2)}</td>
+                    <td>${expense.uploader}</td>
+                    <td><button onclick="deleteRecord(${index})" class="delete-btn">删除</button></td>
+                </tr>
+            `).join('');
+        }
+
+        // 删除单条记录
+        function deleteRecord(index) {
+            if(prompt('请输入管理密码：') !== ADMIN_PASSWORD) return;
+            
+            const expenses = JSON.parse(localStorage.getItem('expenses'));
+            expenses.splice(index, 1);
+            localStorage.setItem('expenses', JSON.stringify(expenses));
+            
+            recalculateBalances();
+            updateDisplay();
+        }
+
+        // 重新计算余额
+        function recalculateBalances() {
+            const expenses = JSON.parse(localStorage.getItem('expenses'));
+            const newBalances = {};
+            
+            expenses.forEach(expense => {
+                newBalances[expense.payer] = (newBalances[expense.payer] || 0) + expense.price;
+            });
+            
+            localStorage.setItem('balances', JSON.stringify(newBalances));
+        }
+
+        // 管理功能
+        function showAdminPanel() {
+            if(document.getElementById('adminPass').value === ADMIN_PASSWORD) {
+                document.getElementById('adminPanel').style.display = 'block';
+            }
+        }
+
+        function deleteAllData() {
+            if(!confirm('确定要删除所有数据吗？')) return;
+            localStorage.clear();
+            location.reload();
+        }
+
+        function exportData() {
+            const data = {
+                expenses: JSON.parse(localStorage.getItem('expenses')),
+                balances: JSON.parse(localStorage.getItem('balances'))
+            };
+            const blob = new Blob([JSON.stringify(data)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `宿舍开支_${new Date().toLocaleDateString()}.json`;
+            a.click();
+        }
+
+        // 修改后的window.onload初始化
+        window.onload = function() {
+            const savedUser = localStorage.getItem('savedUser');
+            if(savedUser) {
+                currentUser = savedUser;
+                showMainInterface();
+                
+                // 新增延迟设置确保元素加载完成
+                setTimeout(() => {
+                    const payerSelect = document.getElementById('payer');
+                    if (payerSelect) {
+                        payerSelect.value = currentUser;
+                    }
+                }, 50);
+            } else {
+                document.getElementById('loginSection').style.display = 'block';
+            }
+        }
+        
+        // 添加移动端优化功能
+        document.addEventListener('DOMContentLoaded', function() {
+            // 防止双击缩放
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', function(event) {
+                const now = Date.now();
+                if (now - lastTouchEnd <= 300) {
+                    event.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
+
+            // 输入框自动聚焦
+            if (document.getElementById('item')) {
+                document.getElementById('item').focus();
+            }
+        });
+
+        // 添加键盘快捷操作
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && document.getElementById('mainContent').style.display !== 'none') {
+                addExpense();
+            }
+        });
+    </script>
+</body>
+</html>
