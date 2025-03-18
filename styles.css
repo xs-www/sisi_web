@@ -1,0 +1,186 @@
+/* 基础样式重置 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+:root {
+    --primary-color: #2A2A2A;
+    --accent-color: #6C63FF;
+    --text-color: #333;
+}
+
+body {
+    line-height: 1.6;
+    color: var(--text-color);
+    background: #f8f9fa;
+}
+
+/* 头部样式 */
+header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    text-align: center;
+    padding: 4rem 1rem;
+}
+
+.avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    margin-bottom: 1rem;
+    border: 3px solid white;
+}
+
+/* 项目展示区 */
+.projects {
+    max-width: 1200px;
+    margin: 3rem auto;
+    padding: 0 1rem;
+}
+
+.project-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.project-card {
+    background: white;
+    border-radius: 10px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.project-card:hover {
+    transform: translateY(-5px);
+}
+
+/* 社交链接 */
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 2rem;
+    }
+
+    .social-link {
+        color: white;
+        font-size: 1.5rem;
+        transition: opacity 0.3s ease;
+        text-decoration: none;
+    }
+
+    .social-link:hover {
+        opacity: 0.8;
+    }
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    header {
+        padding: 2rem 1rem;
+    }
+}
+
+ /* 新增卡片链接相关样式 */
+ .project-card {
+    position: relative;
+    display: block; /* 将div改为块级元素 */
+    text-decoration: none; /* 移除默认链接样式 */
+    color: inherit; /* 继承文字颜色 */
+    cursor: pointer;
+}
+
+/* 添加点击视觉反馈 */
+.project-card:active {
+    transform: translateY(-2px);
+}
+
+/* 添加链接指示小图标 */
+.card-link-icon {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    opacity: 0.6;
+    transition: opacity 0.3s;
+}
+
+.project-card:hover .card-link-icon {
+    opacity: 1;
+}
+
+.icon-mcmod {
+    display: inline-block;
+    width: 1.4em;
+    height: 1.4em;
+    vertical-align: -0.15em;
+    background: url('https://www.mcmod.cn/favicon.ico') no-repeat center;
+    background-size: contain;
+    filter: none;
+}
+
+.icon-github {
+    display: inline-block;
+    width: 1.4em;
+    height: 1.4em;
+    vertical-align: -0.15em;
+    background: url('https://github.com/favicon.ico') no-repeat center;
+    background-size: contain;
+    filter: none;
+}
+
+.icon-bilibili {
+    display: inline-block;
+    width: 1.4em;
+    height: 1.4em;
+    vertical-align: -0.15em;
+    background: url('https://bilibili.com/favicon.ico') no-repeat center;
+    background-size: contain;
+    filter: none;
+}
+
+/* 正在施工标签 */
+.construction-badge {
+    position: absolute;
+    top: 15px;
+    left: 450px;
+    background: #ff4757;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* 动态调整项目布局 */
+.project-grid {
+    /* 默认布局 */
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+/* 当有3个及以上项目时 */
+.project-grid:has(> :nth-child(3)) {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+    .project-grid {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .project-grid:has(> :nth-child(3)) {
+        grid-template-columns: 1fr;
+    }
+}

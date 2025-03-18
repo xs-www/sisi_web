@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>宿舍开支管理系统</title>
+    <link rel="stylesheet" href="styles.css">
+
+</head>
+<body>
+    <!-- 主界面 -->
+    <div id="mainContent" class="section">
+        <div style="text-align: right;">
+            <span id="currentUser"></span>
+            <button onclick="logout()">注销</button>
+        </div>
+        
+        <h2>新增开支</h2>
+        <input type="text" id="item" placeholder="物品名称">
+        <input type="number" id="price" placeholder="价格">
+        <label for="payer">支付者:</label> 
+        <select id="payer">
+            <option value="bowei">Bowei</option>
+            <option value="winston">Winston</option>
+            <option value="alan">Alan</option>
+            <option value="zach">Zach</option>
+        </select>
+        <button onclick="addExpense()">添加记录</button>
+
+        <h2>累计支出</h2>
+        <table id="balanceTable">
+            <thead><tr><th>姓名</th><th>总支出</th></tr></thead>
+            <tbody id="balanceBody"></tbody>
+        </table>
+        <button onclick="clearBalances()" style="width:auto; padding:6px 12px; margin-left:10px;">清账</button>
+
+        <h2>最近记录</h2>
+
+        <div class="table-container">
+            <table id="logTable">
+                <thead>
+                    <tr>
+                        <th>时间</th>
+                        <th>支付人</th>
+                        <th>物品</th>
+                        <th>金额</th>
+                    </tr>
+                </thead>
+                <tbody id="logBody"></tbody>
+            </table>
+        </div>
+        
+    </div>
+    <script src="scripts.js"></script>
+</body>
+</html>
