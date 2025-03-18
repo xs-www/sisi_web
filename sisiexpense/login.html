@@ -17,7 +17,6 @@
         
     </div>
     <script>
-
         const API_BASE = 'http://localhost:5000/api';
 
         async function login() {
@@ -35,6 +34,7 @@
 
                 const { user, token } = await response.json();
                 localStorage.setItem('token', token);
+                localStorage.setItem('currentUser', user);
                 window.location.replace("main.html");
             } catch (error) {
                 alert(`登录失败: ${error.message}`);

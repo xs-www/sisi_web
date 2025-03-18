@@ -160,8 +160,8 @@ def add_expense(current_user, data):
         data['expenses'] = [] # 初始化消费记录
     
     data['expenses'].append(new_expense) # 添加新记录
-    if [new_expense['payer']] != 'System': # 如果不是系统记录
-        data['users'][new_expense['payer']]['balance'] = data['users'][new_expense['payer']].get('balance', 0.0) + new_expense['price'] # 更新支付人余额
+    if new_expense['payer'] != 'System': # 如果不是系统记录
+        data['users'][new_expense['payer']]['balance'] += new_expense['price'] # 更新支付人余额
     return jsonify(new_expense), 201 # 返回新记录
 
 @app.route('/api/balances', methods=['GET']) # 获取用户余额
